@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Activity Completed{% endblock %}
+
+{% block content %}
+<div class="card" style="text-align:center;">
+    <h1>🎉 Activity Completed!</h1>
+    {% if activity %}
+        <p>You have successfully completed: <strong>{{ activity.title }}</strong>.</p>
+    {% else %}
+        <p>You have successfully completed this activity.</p>
+    {% endif %}
+
+    <p style="font-size: 2rem; margin: 1rem 0;">⭐ ⭐ ⭐</p>
+
+    {% if child %}
+        <p><a href="{% url 'children:child_dashboard' pk=child.pk %}" class="btn">Back to Dashboard</a></p>
+    {% else %}
+        <p><a href="{% url 'accounts:home' %}" class="btn">Back to Home</a></p>
+    {% endif %}
+</div>
+{% endblock %}
+

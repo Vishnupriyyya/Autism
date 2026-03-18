@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Progress - {{ child.get_full_name }}{% endblock %}
+
+{% block content %}
+<h1>Progress Report: {{ child.get_full_name }}</h1>
+
+<div class="card">
+    <h2>Completed Activities</h2>
+    {% if completions %}
+    <ul>
+        {% for c in completions %}
+        <li>{{ c.activity.title }} ({{ c.activity.module.name }}) — {{ c.completed_at|date:"M d, Y" }}{% if c.reward_earned %} — {{ c.reward_earned }} pts{% endif %}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No completed activities yet.</p>
+    {% endif %}
+</div>
+
+<p><a href="{% url 'children:child_dashboard' pk=child.pk %}">Back to Child Dashboard</a></p>
+<p><a href="{% url 'children:parent_dashboard' %}">Back to Parent Dashboard</a></p>
+{% endblock %}

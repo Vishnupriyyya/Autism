@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Parent Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/parent_dash.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-dtnMjI6w5L/1Y1y9YAzf7BrZbZ2GM+Fz8kK7wKHrjvMj1CZhk6JmPcVh4Od0e5K1zVY0BekhXK5S4Q1Y9R06Yw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+    /* make dashboard take full browser width instead of base container limit */
+    .container {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="logo">Sparkling Minds</div>
+        <nav>
+            <ul>
+                <li class="active">🏠 My Children</li>
+                <li>📝 Assign Modules</li>
+                <li>📈 Progress Reports</li>
+                <li>💡 Suggestions</li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <header class="main-header">
+            <h2>Parent Dashboard</h2>
+            <div class="user-pill">Parent Profile 👤</div>
+        </header>
+
+        <section class="profile-section">
+            <h3>Child Profiles</h3>
+            <div class="profile-grid">
+                {% for child in children %}
+                <div class="child-card">
+                    {% comment %} show checkmark if all competencies are complete {% endcomment %}
+                    {% if child.all_competencies_completed %}
+                    <div class="status-badge complete">✓</div>
+                    {% endif %}
+
+                    <div class="profile-img-container">
+                        {% if child.avatar %}
+                            <img src="{{ child.avatar.url }}" alt="{{ child.get_full_name }}">
+                        {% else %}
+                            <img src="{% static 'images/default-avatar.png' %}" alt="{{ child.get_full_name }}">
+                        {% endif %}
+                    </div>
+
+                    <div class="child-info">
+                        <h4>{{ child.get_full_name }}</h4>
+                        {% if child.get_age %}<p>Age: {{ child.get_age }} yrs</p>{% endif %}
+                        <p class="grade">Level: {{ child.grade_level|default:"Preschool" }}</p>
+                    </div>
+
+                    <div class="mini-badges">
+                        {% for badge in child.competency_badges %}
+                        <span class="badge {{ badge.color_class }}"></span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="card-actions">
+                        <a href="{% url 'children:child_dashboard' pk=child.pk %}" class="view-btn">View Stats</a>
+                        <a href="{% url 'children:child_edit' pk=child.pk %}" class="edit-btn">✎ Edit</a>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No children added yet.</p>
+                {% endfor %}
+
+                {# add new child card #}
+                <div class="child-card add-card">
+                    <a href="{% url 'children:child_create' %}" class="add-child-link">+ Add Child</a>
+                </div>
+            </div>
+        </section>
+
+        {% if skills_overview %}
+        <div class="skills-overview-under">
+            {% for skill in skills_overview %}
+            <div class="skill-item">
+                <div class="skill-circle {{ skill.color_class }}">
+                    <i class="{{ skill.icon }}"></i>
+                    <span class="skill-text">{{ skill.label }}</span>
+                    {% if skill.completed %}<span class="check-mark">✓</span>{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <section class="modules-section">
+            <h3>Assigned Learning Modules</h3>
+            <div class="table-container">
+                <table class="module-table">
+                    <thead>
+                        <tr>
+                            <th>Module Name</th>
+                            <th>Progress</th>
+                            <th>Status</th>
+                            <th>Enabled</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for module in assigned_modules %}
+                        <tr>
+                            <td>{{ module.name }}</td>
+                            <td><div class="progress-bar"><div class="fill" style="width: {{ module.progress }}%;"></div></div></td>
+                            <td><span class="status-tag {% if module.progress == 100 %}complete{% else %}active{% endif %}">{% if module.progress == 100 %}Completed{% else %}In Progress{% endif %}</span></td>
+                            <td>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" data-module="{{ module.name }}" {% if module.enabled %}checked{% endif %}>
+                                    <span class="slider"></span>
+                                </label>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4">No modules assigned.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+// handle toggle switches for modules
+function getCSRFToken() {
+    const cookies = document.cookie.split(';').map(c=>c.trim());
+    for (let c of cookies) {
+        if (c.startsWith('csrftoken=')) return c.split('=')[1];
+    }
+    return '';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.toggle-switch input').forEach(cb=>{
+        cb.addEventListener('change', function() {
+            const moduleName = this.dataset.module;
+            const enabled = this.checked;
+            fetch("{% url 'children:toggle_module' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCSRFToken(),
+                },
+                body: `module_name=${encodeURIComponent(moduleName)}&enabled=${enabled}`
+            }).then(r=>r.json()).then(data=>{
+                console.log('toggle response', data);
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

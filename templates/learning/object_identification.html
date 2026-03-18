@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Object Identification - {{ activity.title }}{% endblock %}
+
+{% block content %}
+<h1>Object Identification</h1>
+<p>Listen to or read the word, then tap the matching picture.</p>
+
+<div class="card" id="oi-card">
+    <p><strong>Find:</strong> <span id="oi-target-word" style="font-size:1.4rem;"></span></p>
+
+    <div id="oi-picture-row" style="display:flex;flex-wrap:wrap;gap:1rem;margin-top:1rem;justify-content:center;">
+        <!-- picture cards rendered by JS -->
+    </div>
+
+    <p id="oi-feedback" style="margin-top:1rem;font-weight:bold;text-align:center;"></p>
+</div>
+
+{% if child %}
+<form id="oi-complete-form" method="post" action="{% url 'learning:complete_activity' %}">
+    {% csrf_token %}
+    <input type="hidden" name="activity_id" value="{{ activity.pk }}">
+    <input type="hidden" name="child_id" value="{{ child.pk }}">
+    <input type="hidden" name="reward" value="{{ activity.reward_points }}">
+    <input type="hidden" name="score" id="oi-score-input" value="">
+</form>
+<p><a href="{% url 'children:child_dashboard' pk=child.pk %}">⬅ Back to Dashboard</a></p>
+{% else %}
+<p><a href="{% url 'accounts:home' %}">⬅ Back to Home</a></p>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    // Simple object set using clear emoji stand-ins; you can replace emoji with real images later.
+    const objects = [
+      { word: "apple",  emoji: "🍎", color: "#e74c3c" },
+      { word: "book",   emoji: "📘", color: "#2980b9" },
+      { word: "chair",  emoji: "🪑", color: "#8e44ad" },
+      { word: "dog",    emoji: "🐶", color: "#d35400" },
+      { word: "fish",   emoji: "🐟", color: "#16a085" },
+      { word: "phone",  emoji: "📱", color: "#2c3e50" }
+    ];
+
+    const targetWordSpan = document.getElementById("oi-target-word");
+    const pictureRow = document.getElementById("oi-picture-row");
+    const feedback = document.getElementById("oi-feedback");
+    const scoreInput = document.getElementById("oi-score-input");
+    const completeForm = document.getElementById("oi-complete-form");
+
+    if (!targetWordSpan || !pictureRow) return;
+
+    let currentTarget = null;
+    let correctCount = 0;
+    const neededCorrect = 5;
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function pickTarget() {
+      currentTarget = objects[Math.floor(Math.random() * objects.length)];
+      targetWordSpan.textContent = currentTarget.word;
+      renderPictures();
+      feedback.textContent = "";
+    }
+
+    function renderPictures() {
+      pictureRow.innerHTML = "";
+      // pick 2 other random objects as distractors
+      const others = shuffle(objects.filter(o => o.word !== currentTarget.word)).slice(0, 2);
+      const choices = shuffle([currentTarget, ...others]);
+
+      choices.forEach(function (obj) {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.style.display = "flex";
+        card.style.flexDirection = "column";
+        card.style.alignItems = "center";
+        card.style.justifyContent = "center";
+        card.style.width = "120px";
+        card.style.height = "120px";
+        card.style.borderRadius = "12px";
+        card.style.border = "none";
+        card.style.cursor = "pointer";
+        card.style.background = obj.color;
+        card.style.color = "#ffffff";
+        card.style.boxShadow = "0 3px 6px rgba(0,0,0,0.2)";
+        card.style.fontSize = "2.4rem";
+
+        const emojiSpan = document.createElement("span");
+        emojiSpan.textContent = obj.emoji;
+        const textSpan = document.createElement("span");
+        textSpan.textContent = obj.word;
+        textSpan.style.fontSize = "1rem";
+        textSpan.style.marginTop = "0.3rem";
+
+        card.appendChild(emojiSpan);
+        card.appendChild(textSpan);
+
+        card.addEventListener("click", function () {
+          handleChoice(obj);
+        });
+
+        pictureRow.appendChild(card);
+      });
+    }
+
+    function handleChoice(chosen) {
+      if (!currentTarget) return;
+      if (chosen.word === currentTarget.word) {
+        correctCount += 1;
+        feedback.textContent = "Great job! You found the right object.";
+        feedback.style.color = "#27ae60";
+      } else {
+        feedback.textContent = "Try again. Look carefully at the word.";
+        feedback.style.color = "#e74c3c";
+      }
+
+      if (correctCount >= neededCorrect) {
+        feedback.textContent = "Fantastic! You identified enough objects.";
+        feedback.style.color = "#27ae60";
+        if (scoreInput && completeForm) {
+          scoreInput.value = correctCount;
+          setTimeout(function () {
+            completeForm.submit();
+          }, 800);
+        }
+      } else if (chosen.word === currentTarget.word) {
+        setTimeout(pickTarget, 600);
+      }
+    }
+
+    pickTarget();
+  })();
+</script>
+{% endblock %}
+

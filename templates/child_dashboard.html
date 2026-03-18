@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}{{ child.get_full_name }} - Child Dashboard{% endblock %}
+
+{% block content %}
+<h1>{{ child.get_full_name }}'s Learning Dashboard</h1>
+<p>Select an activity to start learning.</p>
+
+<div class="card">
+    <h2>My Activities</h2>
+    {% if assignments %}
+        <ul>
+            {% for a in assignments %}
+            <li>
+                <a href="{% url 'learning:activity_detail' pk=a.activity.pk %}?child={{ child.pk }}">
+                    {{ a.activity.title }} ({{ a.activity.module.name }})
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No activities assigned yet. Ask your parent to assign some!</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Recommended for You</h2>
+    {% if recommended %}
+        <ul>
+            {% for a in recommended %}
+            <li>
+                <a href="{% url 'learning:activity_detail' pk=a.pk %}?child={{ child.pk }}">
+                    {{ a.title }} ({{ a.module.name }}) — {{ a.difficulty }}
+                </a>
+                {% if user.is_parent %}
+                    <form method="post" action="{% url 'children:assign_activity' child_pk=child.pk %}" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="activity_id" value="{{ a.pk }}">
+                        <button type="submit" class="btn btn-accent" style="margin-left:0.5rem;">Assign</button>
+                    </form>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Complete some activities to get personalized recommendations.</p>
+    {% endif %}
+</div>
+
+{% if user.is_parent and all_activities %}
+<div class="card">
+    <h2>All Activities (Assign Manually)</h2>
+    <ul>
+        {% for a in all_activities %}
+        <li>
+            {{ a.title }} ({{ a.module.name }}) — {{ a.difficulty }}
+            <form method="post" action="{% url 'children:assign_activity' child_pk=child.pk %}" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="activity_id" value="{{ a.pk }}">
+                <button type="submit" class="btn" style="margin-left:0.5rem;">Assign</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<p><a href="{% url 'children:parent_dashboard' %}">⬅ Back to Parent Dashboard</a></p>
+{% endblock %}

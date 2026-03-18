@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Feelings - {{ activity.title }}{% endblock %}
+
+{% block content %}
+<h1>Feelings</h1>
+<p>Look at the face and tap the word that matches the feeling.</p>
+
+<div class="card" id="fe-card">
+    <div id="fe-face-area" style="text-align:center; margin-bottom:1.2rem;">
+        <!-- emotion face card -->
+    </div>
+    <div id="fe-options" style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;">
+        <!-- feeling words -->
+    </div>
+    <p id="fe-feedback" style="margin-top:1rem;font-weight:bold;text-align:center;"></p>
+</div>
+
+{% if child %}
+<form id="fe-complete-form" method="post" action="{% url 'learning:complete_activity' %}">
+    {% csrf_token %}
+    <input type="hidden" name="activity_id" value="{{ activity.pk }}">
+    <input type="hidden" name="child_id" value="{{ child.pk }}">
+    <input type="hidden" name="reward" value="{{ activity.reward_points }}">
+    <input type="hidden" name="score" id="fe-score-input" value="">
+</form>
+<p><a href="{% url 'children:child_dashboard' pk=child.pk %}">⬅ Back to Dashboard</a></p>
+{% else %}
+<p><a href="{% url 'accounts:home' %}">⬅ Back to Home</a></p>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    // Simple emotion set using clear emoji faces; can be replaced with real images later.
+    const feelings = [
+      { word: "happy",    emoji: "😊", color: "#f1c40f" },
+      { word: "sad",      emoji: "😢", color: "#3498db" },
+      { word: "angry",    emoji: "😡", color: "#e74c3c" },
+      { word: "scared",   emoji: "😨", color: "#9b59b6" },
+      { word: "surprised",emoji: "😲", color: "#1abc9c" },
+      { word: "tired",    emoji: "😴", color: "#95a5a6" }
+    ];
+
+    const faceArea = document.getElementById("fe-face-area");
+    const optionsArea = document.getElementById("fe-options");
+    const feedback = document.getElementById("fe-feedback");
+    const scoreInput = document.getElementById("fe-score-input");
+    const completeForm = document.getElementById("fe-complete-form");
+
+    if (!faceArea || !optionsArea) return;
+
+    let currentFeeling = null;
+    let correctCount = 0;
+    const neededCorrect = 5;
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function pickFeeling() {
+      currentFeeling = feelings[Math.floor(Math.random() * feelings.length)];
+      renderFace();
+      renderOptions();
+      feedback.textContent = "";
+    }
+
+    function renderFace() {
+      faceArea.innerHTML = "";
+      const card = document.createElement("div");
+      card.style.display = "inline-flex";
+      card.style.flexDirection = "column";
+      card.style.alignItems = "center";
+      card.style.justifyContent = "center";
+      card.style.width = "180px";
+      card.style.height = "180px";
+      card.style.borderRadius = "50%";
+      card.style.background = currentFeeling.color;
+      card.style.color = "#ffffff";
+      card.style.fontSize = "4rem";
+      card.style.boxShadow = "0 4px 8px rgba(0,0,0,0.25)";
+
+      const emojiSpan = document.createElement("span");
+      emojiSpan.textContent = currentFeeling.emoji;
+
+      card.appendChild(emojiSpan);
+      faceArea.appendChild(card);
+    }
+
+    function renderOptions() {
+      optionsArea.innerHTML = "";
+      const others = shuffle(feelings.filter(f => f.word !== currentFeeling.word)).slice(0, 2);
+      const choices = shuffle([currentFeeling, ...others]);
+
+      choices.forEach(function (f) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = f.word;
+        btn.style.minWidth = "110px";
+        btn.style.padding = "0.6rem 1rem";
+        btn.style.borderRadius = "999px";
+        btn.style.border = "2px solid #ccc";
+        btn.style.background = "#ffffff";
+        btn.style.cursor = "pointer";
+        btn.style.fontSize = "1rem";
+        btn.addEventListener("click", function () {
+          handleChoice(f);
+        });
+        optionsArea.appendChild(btn);
+      });
+    }
+
+    function handleChoice(chosen) {
+      if (!currentFeeling) return;
+      if (chosen.word === currentFeeling.word) {
+        correctCount += 1;
+        feedback.textContent = "Great job! That matches the feeling.";
+        feedback.style.color = "#27ae60";
+      } else {
+        feedback.textContent = "Try again. Look at the face and think about the feeling.";
+        feedback.style.color = "#e74c3c";
+      }
+
+      if (correctCount >= neededCorrect) {
+        feedback.textContent = "Fantastic! You recognized enough feelings.";
+        feedback.style.color = "#27ae60";
+        if (scoreInput && completeForm) {
+          scoreInput.value = correctCount;
+          setTimeout(function () {
+            completeForm.submit();
+          }, 800);
+        }
+      } else if (chosen.word === currentFeeling.word) {
+        setTimeout(pickFeeling, 600);
+      }
+    }
+
+    pickFeeling();
+  })();
+</script>
+{% endblock %}
+

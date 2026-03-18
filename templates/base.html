@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Autism Learning Platform{% endblock %}</title>
+    <style>
+        :root { --primary: #4a90a4; --accent: #f5a623; --bg: #f8f9fa; --text: #2c3e50; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+        .header { background: var(--primary); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .header a { color: white; text-decoration: none; }
+        .nav a { margin-left: 1rem; }
+        .container { max-width: 960px; margin: 0 auto; padding: 2rem; }
+        .btn { display: inline-block; padding: 0.5rem 1rem; background: var(--primary); color: white; border-radius: 6px; text-decoration: none; border: none; cursor: pointer; }
+        .btn:hover { opacity: 0.9; }
+        .btn-accent { background: var(--accent); }
+        .card { background: white; border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        ul { list-style: none; }
+        ul li { margin: 0.5rem 0; }
+        ul li a { color: var(--primary); text-decoration: none; }
+        ul li a:hover { text-decoration: underline; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="header">
+        <a href="{% url 'accounts:home' %}">Autism Learning Platform</a>
+        <nav class="nav">
+            {% if user.is_authenticated %}
+                <span>Hello, {{ user.get_full_name|default:user.username }}</span>
+                <a href="{% url 'accounts:logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'accounts:login' %}">Login</a>
+                <a href="{% url 'accounts:register' %}">Register</a>
+            {% endif %}
+        </nav>
+    </header>
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

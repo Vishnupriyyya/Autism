@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}{{ activity.title }}{% endblock %}
+
+{% block content %}
+<h1>{{ activity.title }}</h1>
+<p>{{ activity.description|default:"Complete this activity." }}</p>
+
+{% if activity.image %}<img src="{{ activity.image.url }}" alt="{{ activity.title }}" style="max-width: 300px;">{% endif %}
+{% if activity.audio_guide %}<audio controls src="{{ activity.audio_guide.url }}"></audio>{% endif %}
+
+<div class="card">
+    <p>Difficulty: {{ activity.difficulty }}</p>
+    {% if child %}
+    <form id="complete-form" method="post" action="{% url 'learning:complete_activity' %}">
+        {% csrf_token %}
+        <input type="hidden" name="activity_id" value="{{ activity.pk }}">
+        <input type="hidden" name="child_id" value="{{ child.pk }}">
+        <input type="hidden" name="reward" value="{{ activity.reward_points }}">
+        <button type="submit" class="btn btn-accent">✔ Complete Activity</button>
+    </form>
+    {% endif %}
+</div>
+
+{% if child %}
+<p><a href="{% url 'children:child_dashboard' pk=child.pk %}">⬅ Back to Dashboard</a></p>
+{% else %}
+<p><a href="{% url 'accounts:home' %}">⬅ Back to Home</a></p>
+{% endif %}
+{% endblock %}

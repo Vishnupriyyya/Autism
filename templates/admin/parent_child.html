@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <title>Admin - Parents & Children | Sparkling Minds</title>
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <span class="logo-text">Sparkling Minds</span>
+        </div>
+        <ul class="nav-links">
+            <li class="{% if active_section == 'dashboard' %}active{% endif %}"><a href="{% url 'learning:admin_dashboard' %}"><span class="icon">📊</span><span class="link-text">Dashboard</span></a></li>
+            <li class="{% if active_section == 'parent_child' %}active{% endif %}"><a href="{% url 'learning:admin_parent_child' %}"><span class="icon">👥</span><span class="link-text">Parent & Child</span></a></li>
+            <li><a href="{% url 'learning:manage_modules' %}"><span class="icon">📚</span><span class="link-text">Learning Modules</span></a></li>
+            <li><a href="#"><span class="icon">🖼️</span><span class="link-text">Manage Content</span></a></li>
+            <li><a href="#"><span class="icon">⚙️</span><span class="link-text">Settings</span></a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <h1>Parent &amp; Child Accounts</h1>
+            <div class="header-controls">
+                <input type="text" placeholder="Search..." class="search-field">
+                <span class="icon">🔔</span>
+            </div>
+            <div class="user-profile">{{ user.get_full_name|default:user.username }} 👤</div>
+        </header>
+
+        <section class="accounts-section">
+            <div class="card">
+                <h3>Parents</h3>
+                <ul>
+                    {% for p in parent_list %}
+                        <li>{{ p.get_full_name|default:p.username }} &ndash; Joined {{ p.date_joined|date:"SHORT_DATE_FORMAT" }}</li>
+                    {% empty %}
+                        <li>No parent accounts found.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Children</h3>
+                <ul>
+                    {% for c in child_list %}
+                        <li>{{ c.name }} ({{ c.parent.get_full_name|default:c.parent.username }})</li>
+                    {% empty %}
+                        <li>No child profiles available.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+    </main>
+</div>
+
+</body>
+</html>

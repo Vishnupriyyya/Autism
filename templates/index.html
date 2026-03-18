@@ -1,0 +1,46 @@
+
+{% block title %}Sparkling Minds — Home{% endblock %}
+
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        /* Homepage: let header overlay the hero without adding top padding */
+        .header {
+            background: transparent !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: none !important;
+        }
+        .header a, .nav a { color: white !important; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<section class="hero-container">
+    <div class="logo-badge">Sparkling Minds</div>
+
+    <!-- floating icons -->
+    <img src="{% static 'images/star.svg' %}" class="icon star" alt="star">
+    <img src="{% static 'images/apple.svg' %}" class="icon apple" alt="apple">
+    <img src="{% static 'images/car.svg' %}" class="icon car" alt="car">
+    <img src="{% static 'images/bee.svg' %}" class="icon bee" alt="bee">
+    <img src="{% static 'images/robot.svg' %}" class="icon robot" alt="robot">
+    <img src="{% static 'images/balloon.svg' %}" class="icon balloon" alt="balloon">
+    <img src="{% static 'images/book.svg' %}" class="icon book" alt="book">
+    <img src="{% static 'images/puzzle.svg' %}" class="icon puzzle" alt="puzzle">
+    <img src="{% static 'images/moon.svg' %}" class="icon moon" alt="moon">
+    <img src="{% static 'images/sun.svg' %}" class="icon sun" alt="sun">
+
+    <div class="hero-content">
+        <h1>Fun & Learning<br>Adventures!</h1>
+        <a href="{% url 'accounts:login' %}" class="cta-button">Start the Adventure!</a>
+    </div>
+
+    <div class="star-rating" aria-hidden="true">★★★</div>
+</section>
+{% endblock %}

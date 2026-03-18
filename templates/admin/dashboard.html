@@ -1,0 +1,161 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <title>Admin Dashboard | Sparkling Minds</title>
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <span class="logo-text">Sparkling Minds</span>
+        </div>
+        <ul class="nav-links">
+            <li class="{% if active_section == 'dashboard' %}active{% endif %}"><a href="{% url 'learning:admin_dashboard' %}"><span class="icon">📊</span><span class="link-text">Dashboard</span></a></li>
+            <li class="{% if active_section == 'parent_child' %}active{% endif %}"><a href="{% url 'learning:admin_parent_child' %}"><span class="icon">👥</span><span class="link-text">Parent & Child</span></a></li>
+            <li class="{% if active_section == 'modules' %}active{% endif %}"><a href="{% url 'learning:manage_modules' %}"><span class="icon">📚</span><span class="link-text">Learning Modules</span></a></li>
+            <li class="{% if active_section == 'content' %}active{% endif %}"><a href="{% url 'learning:manage_modules' %}"><span class="icon">🖼️</span><span class="link-text">Manage Content</span></a></li>
+            <li class="{% if active_section == 'settings' %}active{% endif %}"><a href="{% url 'learning:admin_settings' %}"><span class="icon">⚙️</span><span class="link-text">Settings</span></a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <h1>Admin Dashboard</h1>
+            <div class="header-controls">
+                <input type="text" id="searchInput" placeholder="Search modules, users, or activities..." class="search-field">
+                <span class="icon">🔍</span>
+            </div>
+            <div class="user-profile">{{ user.get_full_name|default:user.username }} 👤</div>
+        </header>
+
+        <section class="stats-grid">
+            <div class="stat-card">
+                <span class="label">Total Users</span>
+                <div class="value circle-teal">{{ total_users }}</div>
+            </div>
+            <div class="stat-card">
+                <span class="label">Active Accounts</span>
+                <div class="value circle-yellow">{{ active_accounts }}</div>
+            </div>
+            <div class="stat-card">
+                <span class="label">Completions</span>
+                <div class="value">{{ completions }}</div>
+            </div>
+        </section>
+
+        <!-- management & activity widgets -->
+        <section class="lower-grid">
+            <div class="card content-card">
+                <h3>Manage Content</h3>
+                <div class="content-icons">
+                    <div class="icon-btn">📄<br>Upload Images</div>
+                    <div class="icon-btn">🎥<br>Audit Videos</div>
+                    <div class="icon-btn">🎙️<br>Audio Instructions</div>
+                </div>
+            </div>
+            
+            <div class="card chart-card">
+                <h3>Overall Activity Statistics</h3>
+                <div class="progress-container">
+                    <div class="donut-chart">{{ completion_rate }}%</div>
+                    <p>Completion Rate</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- learning modules list -->
+        <section class="modules-section">
+            <h2>Learning Modules</h2>
+            <table class="modules-table">
+                <thead>
+                    <tr><th>Name</th><th>Category</th><th>Status</th><th>Activities</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                    {% for mod in modules %}
+                        <tr class="searchable-row">
+                            <td>{{ mod.name }}</td>
+                            <td>{{ mod.get_category_display }}</td>
+                            <td>{% if mod.is_active %}<span style="color: green;">✓ Active</span>{% else %}<span style="color: red;">✗ Inactive</span>{% endif %}</td>
+                            <td>{{ mod.activities.all|length }}</td>
+                            <td><a href="#" class="btn-small">Manage</a></td>
+                        </tr>
+                    {% empty %}
+                        <tr class="searchable-row"><td colspan="5">No modules available</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <!-- user & progress tracking -->
+        <section class="user-progress">
+            <div class="accounts-list">
+                <h3>Parent & Child Accounts</h3>
+                <ul>
+                    {% for p in parent_list %}
+                        <li>{{ p.get_full_name|default:p.username }} (Parent)</li>
+                    {% endfor %}
+                </ul>
+                <ul>
+                    {% for c in child_list %}
+                        <li>{{ c.name }} (Child of {{ c.parent.get_full_name|default:c.parent.username }})</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="charts-area">
+                <h3>Activity Trends</h3>
+                <div class="bar-chart">
+                    {% for t in activity_trends %}
+                        <div class="bar" style="height:{{ t.height }}px" title="{{ t.day }}: {{ t.count }}"></div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    // Search functionality for admin dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const moduleRows = document.querySelectorAll('.modules-table tbody .searchable-row');
+        const accountItems = document.querySelectorAll('.accounts-list ul li');
+        
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function(e) {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                let moduleVisibleCount = 0;
+                let accountVisibleCount = 0;
+                
+                // Search in modules table
+                moduleRows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    if (searchTerm === '' || text.includes(searchTerm)) {
+                        row.style.display = '';
+                        moduleVisibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                // Search in accounts list
+                accountItems.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    if (searchTerm === '' || text.includes(searchTerm)) {
+                        item.style.display = '';
+                        accountVisibleCount++;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

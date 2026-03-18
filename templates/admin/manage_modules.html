@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Modules{% endblock %}
+
+{% block content %}
+<h1>Manage Learning Modules</h1>
+<p>Modules and activities are managed via Django Admin. Use the link below to add or edit content.</p>
+<p><a href="/admin/learning/" class="btn">Open Learning Admin</a></p>
+
+<h2>Current Modules</h2>
+{% for module in modules %}
+<div class="card">
+    <h3>{{ module.name }} ({{ module.get_category_display }})</h3>
+    <ul>
+        {% for activity in module.activities.all %}
+        <li>{{ activity.title }} — {{ activity.difficulty }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endfor %}
+<p><a href="{% url 'learning:admin_dashboard' %}">⬅ Back to Admin Dashboard</a></p>
+{% endblock %}

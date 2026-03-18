@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Color Matching - {{ activity.title }}{% endblock %}
+
+{% block content %}
+<h1>Color Matching</h1>
+<p>Look at the target color and tap the matching block.</p>
+
+<div class="card" id="cm-card">
+    <p><strong>Target color:</strong> <span id="cm-target-label"></span></p>
+    <div id="cm-target-preview" style="width:80px;height:80px;border-radius:8px;margin:0.5rem 0;"></div>
+
+    <div id="cm-options" style="display:flex;flex-wrap:wrap;gap:1rem;margin-top:1rem;">
+        <!-- color options rendered by JS -->
+    </div>
+
+    <p id="cm-feedback" style="margin-top:1rem;font-weight:bold;"></p>
+</div>
+
+{% if child %}
+<form id="cm-complete-form" method="post" action="{% url 'learning:complete_activity' %}">
+    {% csrf_token %}
+    <input type="hidden" name="activity_id" value="{{ activity.pk }}">
+    <input type="hidden" name="child_id" value="{{ child.pk }}">
+    <input type="hidden" name="reward" value="{{ activity.reward_points }}">
+    <input type="hidden" name="score" id="cm-score-input" value="">
+</form>
+<p><a href="{% url 'children:child_dashboard' pk=child.pk %}">⬅ Back to Dashboard</a></p>
+{% else %}
+<p><a href="{% url 'accounts:home' %}">⬅ Back to Home</a></p>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    const colors = [
+      { name: "Red",    css: "#e74c3c" },
+      { name: "Blue",   css: "#3498db" },
+      { name: "Green",  css: "#27ae60" },
+      { name: "Yellow", css: "#f1c40f" }
+    ];
+
+    const targetLabel = document.getElementById("cm-target-label");
+    const targetPreview = document.getElementById("cm-target-preview");
+    const optionsArea = document.getElementById("cm-options");
+    const feedback = document.getElementById("cm-feedback");
+    const scoreInput = document.getElementById("cm-score-input");
+    const completeForm = document.getElementById("cm-complete-form");
+
+    if (!targetLabel || !targetPreview || !optionsArea) return;
+
+    let targetColor = null;
+    let correctCount = 0;
+    const neededCorrect = 5;
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function pickTarget() {
+      targetColor = colors[Math.floor(Math.random() * colors.length)];
+      targetLabel.textContent = targetColor.name;
+      targetLabel.style.color = targetColor.css;
+      targetPreview.style.background = targetColor.css;
+      renderOptions();
+      feedback.textContent = "";
+    }
+
+    function renderOptions() {
+      optionsArea.innerHTML = "";
+      const shuffled = shuffle(colors.slice());
+      shuffled.forEach(function (c) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.style.width = "70px";
+        btn.style.height = "70px";
+        btn.style.borderRadius = "8px";
+        btn.style.border = "none";
+        btn.style.cursor = "pointer";
+        btn.style.background = c.css;
+        btn.style.boxShadow = "0 2px 4px rgba(0,0,0,0.2)";
+        btn.setAttribute("data-color", c.name);
+        btn.addEventListener("click", function () {
+          handleChoice(c);
+        });
+        optionsArea.appendChild(btn);
+      });
+    }
+
+    function handleChoice(chosen) {
+      if (!targetColor) return;
+      if (chosen.name === targetColor.name) {
+        correctCount += 1;
+        feedback.textContent = "Great job! That matches the target color.";
+        feedback.style.color = "#27ae60";
+      } else {
+        feedback.textContent = "Try again. Look at the target color.";
+        feedback.style.color = "#e74c3c";
+      }
+
+      if (correctCount >= neededCorrect) {
+        feedback.textContent = "Fantastic! You matched enough colors.";
+        feedback.style.color = "#27ae60";
+        if (scoreInput && completeForm) {
+          scoreInput.value = correctCount;
+          setTimeout(function () {
+            completeForm.submit();
+          }, 800);
+        }
+      } else if (chosen.name === targetColor.name) {
+        setTimeout(pickTarget, 600);
+      }
+    }
+
+    pickTarget();
+  })();
+</script>
+{% endblock %}
+

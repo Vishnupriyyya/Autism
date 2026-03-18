@@ -1,0 +1,126 @@
+:root {
+    --bg-light: #48c6ef;
+    --bg-dark: #3fb6e0;
+    --yellow-btn: #ffcc33;
+}
+
+* { box-sizing: border-box; }
+
+html,body { height:100%; margin:0; }
+
+.hero-container {
+    /* make the hero escape the page container and fill the viewport */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: repeating-linear-gradient(
+        90deg,
+        var(--bg-light),
+        var(--bg-light) 50px,
+        var(--bg-dark) 50px,
+        var(--bg-dark) 100px
+    );
+    color: white;
+    font-family: 'Comic Sans MS', 'Arial', sans-serif;
+    text-align: center;
+}
+
+/* ensure header sits above the fixed hero */
+.header { position: relative; z-index: 10; }
+
+.logo-badge {
+    /* make the badge independent and always visible */
+    position: fixed;
+    top: 18px;
+    left: 20px;
+    background: white;
+    color: var(--bg-dark);
+    padding: 8px 25px;
+    border-radius: 50px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.12);
+    z-index: 9999; /* ensure it sits above header and hero */
+}
+
+.hero-content h1 {
+    font-size: clamp(2rem, 6vw, 4rem);
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.hero-content p {
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+.cta-button {
+    display: inline-block;
+    margin-top: 30px;
+    background-color: var(--yellow-btn);
+    color: #444;
+    padding: 15px 40px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.2rem;
+    box-shadow: 0 5px 0 #d4a017;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.cta-button:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+/* Positioning icons around the screen */
+.icon {
+    position: absolute;
+    width: 120px; /* increased size */
+    filter: drop-shadow(0 6px 6px rgba(0,0,0,0.18));
+    transform-origin: center;
+    transition: transform 0.3s ease;
+    will-change: transform;
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(0) rotate(-4deg); }
+    50% { transform: translateY(-18px) rotate(6deg); }
+    100% { transform: translateY(0) rotate(-4deg); }
+}
+
+.star { top: 12%; left: 6%; animation-duration:7s; }
+.apple { top: 34%; left: 10%; animation-duration:5.5s; }
+.car { bottom: 16%; left: 6%; animation-duration:6.3s; }
+.bee { top: 24%; right: 10%; animation-duration:5.2s; }
+.robot { bottom: 18%; right: 8%; animation-duration:6.8s; }
+/* new icons */
+.balloon { top: 8%; right: 18%; animation-duration:6.6s; }
+.book { top: 48%; left: 36%; animation-duration:5.8s; }
+.puzzle { bottom: 10%; left: 30%; animation-duration:6.2s; }
+.moon { top: 6%; left: 48%; animation-duration:7.4s; }
+.sun { top: 14%; right: 6%; animation-duration:5.4s; }
+
+.star-rating {
+    position: absolute;
+    top: 22px;
+    right: 22px;
+    font-size: 1.1rem;
+    opacity: 0.95;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+/* Responsive tweaks */
+@media (max-width:600px) {
+    .icon { width: 64px; }
+    .logo-badge { padding:6px 14px; top:12px; }
+    .hero-content h1 { font-size: 2rem; }
+    .cta-button { padding: 12px 28px; font-size:1rem; }
+}

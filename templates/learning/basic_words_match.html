@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Basic Words - {{ activity.title }}{% endblock %}
+
+{% block content %}
+<h1>Basic Words</h1>
+<p>Look at the picture and tap the correct word that matches it.</p>
+
+<div class="card" id="bw-card">
+    <div id="bw-image-area" style="text-align:center; margin-bottom: 1.5rem;">
+        <!-- Visual card will be drawn here -->
+    </div>
+    <div id="bw-options" style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:center;">
+        <!-- Word buttons -->
+    </div>
+    <p id="bw-feedback" style="margin-top:1rem; font-weight:bold; text-align:center;"></p>
+</div>
+
+{% if child %}
+<form id="bw-complete-form" method="post" action="{% url 'learning:complete_activity' %}">
+    {% csrf_token %}
+    <input type="hidden" name="activity_id" value="{{ activity.pk }}">
+    <input type="hidden" name="child_id" value="{{ child.pk }}">
+    <input type="hidden" name="reward" value="{{ activity.reward_points }}">
+    <input type="hidden" name="score" id="bw-score-input" value="">
+</form>
+{% endif %}
+
+{% if child %}
+<p><a href="{% url 'children:child_dashboard' pk=child.pk %}">⬅ Back to Dashboard</a></p>
+{% else %}
+<p><a href="{% url 'accounts:home' %}">⬅ Back to Home</a></p>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    // Simple visual vocabulary set: you can later replace 'emoji' with real images.
+    const items = [
+      { word: "apple",    emoji: "🍎", color: "#e74c3c" },
+      { word: "ball",     emoji: "⚽", color: "#3498db" },
+      { word: "cup",      emoji: "☕", color: "#8e44ad" },
+      { word: "car",      emoji: "🚗", color: "#e67e22" },
+      { word: "sun",      emoji: "☀️", color: "#f1c40f" },
+      { word: "star",     emoji: "⭐", color: "#f39c12" }
+    ];
+
+    const imageArea = document.getElementById("bw-image-area");
+    const optionsArea = document.getElementById("bw-options");
+    const feedback = document.getElementById("bw-feedback");
+    const scoreInput = document.getElementById("bw-score-input");
+    const completeForm = document.getElementById("bw-complete-form");
+
+    if (!imageArea || !optionsArea) return;
+
+    let currentItem = null;
+    let correctCount = 0;
+    const neededCorrect = 5; // number of correct answers to complete activity
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function pickItem() {
+      currentItem = items[Math.floor(Math.random() * items.length)];
+      renderImage();
+      renderOptions();
+      feedback.textContent = "";
+    }
+
+    function renderImage() {
+      imageArea.innerHTML = "";
+      const card = document.createElement("div");
+      card.style.display = "inline-flex";
+      card.style.flexDirection = "column";
+      card.style.alignItems = "center";
+      card.style.justifyContent = "center";
+      card.style.width = "180px";
+      card.style.height = "180px";
+      card.style.borderRadius = "12px";
+      card.style.background = currentItem.color;
+      card.style.color = "#ffffff";
+      card.style.fontSize = "4rem";
+      card.style.boxShadow = "0 4px 8px rgba(0,0,0,0.2)";
+
+      const emojiSpan = document.createElement("span");
+      emojiSpan.textContent = currentItem.emoji;
+
+      card.appendChild(emojiSpan);
+      imageArea.appendChild(card);
+    }
+
+    function renderOptions() {
+      optionsArea.innerHTML = "";
+      // pick 2 random distractors
+      const others = shuffle(items.filter(i => i.word !== currentItem.word)).slice(0, 2);
+      const choices = shuffle([currentItem, ...others]);
+
+      choices.forEach(item => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = item.word;
+        btn.style.minWidth = "90px";
+        btn.style.padding = "0.6rem 1rem";
+        btn.style.borderRadius = "999px";
+        btn.style.border = "2px solid #ccc";
+        btn.style.background = "#ffffff";
+        btn.style.cursor = "pointer";
+        btn.style.fontSize = "1rem";
+        btn.addEventListener("click", function () {
+          handleChoice(item);
+        });
+        optionsArea.appendChild(btn);
+      });
+    }
+
+    function handleChoice(chosen) {
+      if (!currentItem) return;
+      if (chosen.word === currentItem.word) {
+        correctCount += 1;
+        feedback.textContent = "Great job! That matches the picture.";
+        feedback.style.color = "#27ae60";
+      } else {
+        feedback.textContent = "Try again. Look closely at the picture.";
+        feedback.style.color = "#e74c3c";
+      }
+
+      if (correctCount >= neededCorrect) {
+        feedback.textContent = "Fantastic! You matched enough words.";
+        feedback.style.color = "#27ae60";
+        if (scoreInput && completeForm) {
+          scoreInput.value = correctCount;
+          setTimeout(function () {
+            completeForm.submit();
+          }, 800);
+        }
+      } else if (chosen.word === currentItem.word) {
+        // Only move to next item on a correct answer
+        setTimeout(pickItem, 600);
+      }
+    }
+
+    pickItem();
+  })();
+</script>
+{% endblock %}
+

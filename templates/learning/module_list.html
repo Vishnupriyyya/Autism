@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Learning Modules{% endblock %}
+
+{% block content %}
+<h1>Learning Modules</h1>
+<p>Browse modules by skill category.</p>
+
+{% for module in modules %}
+<div class="card">
+    <h2>{{ module.name }}</h2>
+    <p>{{ module.description|default:"" }}</p>
+    <ul>
+        {% for activity in module.activities.all %}
+        <li><a href="{% url 'learning:activity_detail' pk=activity.pk %}">{{ activity.title }}</a> ({{ activity.difficulty }})</li>
+        {% empty %}
+        <li>No activities in this module yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% empty %}
+<p>No modules available yet.</p>
+{% endfor %}
+{% endblock %}
