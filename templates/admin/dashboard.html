@@ -53,9 +53,9 @@
             <div class="card content-card">
                 <h3>Manage Content</h3>
                 <div class="content-icons">
-                    <div class="icon-btn">📄<br>Upload Images</div>
-                    <div class="icon-btn">🎥<br>Audit Videos</div>
-                    <div class="icon-btn">🎙️<br>Audio Instructions</div>
+                    <a href="/admin/learning/learningactivity/add/" class="icon-btn" title="Add new activity with image upload">📄<br>Upload Images</a>
+                    <a href="/admin/learning/learningmodule/add/" class="icon-btn" title="Add module with icon upload">📁<br>Module Icons</a>
+                    <a href="/admin/learning/learningactivity/add/?module=1" class="icon-btn" title="Add activity with audio/video upload">🎥<br>Audio/Video</a>
                 </div>
             </div>
             
@@ -82,7 +82,7 @@
                             <td>{{ mod.get_category_display }}</td>
                             <td>{% if mod.is_active %}<span style="color: green;">✓ Active</span>{% else %}<span style="color: red;">✗ Inactive</span>{% endif %}</td>
                             <td>{{ mod.activities.all|length }}</td>
-                            <td><a href="#" class="btn-small">Manage</a></td>
+    <td><a href="/admin/learning/learningmodule/{{ mod.id }}/change/" class="btn-small">Manage</a></td>
                         </tr>
                     {% empty %}
                         <tr class="searchable-row"><td colspan="5">No modules available</td></tr>

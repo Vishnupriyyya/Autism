@@ -13,6 +13,21 @@
         width: 100% !important;
         padding: 0 2rem;
     }
+    
+    .progress-btn {
+        background: #6f42c1;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 0.875rem;
+        margin-left: 0.5rem;
+        display: inline-block;
+    }
+    .progress-btn:hover {
+        background: #5a2d91;
+        color: white;
+    }
 </style>
 {% endblock %}
 
@@ -22,10 +37,10 @@
         <div class="logo">Sparkling Minds</div>
         <nav>
             <ul>
-                <li class="active">🏠 My Children</li>
-                <li>📝 Assign Modules</li>
-                <li>📈 Progress Reports</li>
-                <li>💡 Suggestions</li>
+                <li class="active"><a href="#">🏠 My Children</a></li>
+                <li><a href="{% url 'children:assign_modules' %}">📝 Assign Modules</a></li>
+                <li><a href="{% url 'children:progress_overview' %}">📈 Progress Reports</a></li>
+                <li><a href="{% url 'recommendations:suggestions' %}">💡 Suggestions</a></li>
             </ul>
         </nav>
     </aside>
@@ -68,6 +83,7 @@
 
                     <div class="card-actions">
                         <a href="{% url 'children:child_dashboard' pk=child.pk %}" class="view-btn">View Stats</a>
+                        <a href="{% url 'children:progress_report' pk=child.pk %}" class="progress-btn">📊 Progress</a>
                         <a href="{% url 'children:child_edit' pk=child.pk %}" class="edit-btn">✎ Edit</a>
                     </div>
                 </div>
@@ -87,7 +103,7 @@
             {% for skill in skills_overview %}
             <div class="skill-item">
                 <div class="skill-circle {{ skill.color_class }}">
-                    <i class="{{ skill.icon }}"></i>
+                    <i class=" {{ skill.icon }}"></i>
                     <span class="skill-text">{{ skill.label }}</span>
                     {% if skill.completed %}<span class="check-mark">✓</span>{% endif %}
                 </div>
@@ -161,3 +177,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+

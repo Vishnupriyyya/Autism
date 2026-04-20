@@ -171,6 +171,35 @@ def toggle_module(request):
 
 
 @parent_required
+def assign_modules(request):
+    children = ChildProfile.objects.filter(parent=request.user).order_by('first_name')
+    activities = LearningActivity.objects.filter(is_active=True).select_related('module').order_by('module__name', 'module__order', 'order')
+    
+    if request.method == 'POST':
+        child_id = request.POST.get('child_id')
+        activity_ids = request.POST.getlist('activities')
+        if child_id:
+            child = ChildProfile.objects.get(pk=child_id, parent=request.user)
+            assigned_count = 0
+            for activity_id in activity_ids:
+                activity = LearningActivity.objects.get(pk=activity_id)
+                ActivityAssignment.objects.get_or_create(child=child, activity=activity)
+                assigned_count += 1
+            messages.success(request, f'Assigned {assigned_count} activities to {child.get_full_name()}.')
+        else:
+            messages.error(request, 'Please select a child.')
+    
+    context = {'children': children, 'activities': activities}
+    return render(request, 'children/assign_modules.html', context)
+
+@parent_required
+def progress_overview(request):
+    children = ChildProfile.objects.filter(parent=request.user).prefetch_related('completions__activity').order_by('first_name')
+    context = {'children': children}
+    return render(request, 'children/progress_overview.html', context)
+
+
+@parent_required
 def assign_activity(request, child_pk):
     """Assign an activity to a child (parent override of recommendations)."""
     child = get_object_or_404(ChildProfile, pk=child_pk, parent=request.user)

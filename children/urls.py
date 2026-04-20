@@ -11,4 +11,6 @@ urlpatterns = [
     path("child/<int:pk>/progress/", views.progress_report, name="progress_report"),
     path("child/<int:child_pk>/assign/", views.assign_activity, name="assign_activity"),
     path("parent/module/toggle/", views.toggle_module, name="toggle_module"),
+    path("assign-modules/", views.assign_modules, name="assign_modules"),
+    path("progress-overview/", views.progress_overview, name="progress_overview"),
 ]

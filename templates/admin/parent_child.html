@@ -48,7 +48,7 @@
                 <h3>Children</h3>
                 <ul>
                     {% for c in child_list %}
-                        <li>{{ c.name }} ({{ c.parent.get_full_name|default:c.parent.username }})</li>
+{{ c.get_full_name }} ({{ c.parent.get_full_name|default:c.parent.username }})
                     {% empty %}
                         <li>No child profiles available.</li>
                     {% endfor %}

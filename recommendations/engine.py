@@ -16,6 +16,8 @@ class RecommendationEngine:
 
     def __init__(self, child: ChildProfile):
         self.child = child
+        self.skill_focus = getattr(child, 'skill_focus', []) or []
+        self.learning_pace = getattr(child, 'learning_pace', 'medium')
 
     def get_recommendations(self, limit=5):
         """
@@ -25,19 +27,18 @@ class RecommendationEngine:
         3. Include repetition for reinforcement (previously completed)
         4. Exclude already-assigned incomplete activities
         """
-        child = self.child
-        skill_focus = child.skill_focus or []
+        skill_focus = self.skill_focus
 
         # Get IDs of activities already assigned but not completed
         assigned_ids = set(
-            ActivityAssignment.objects.filter(
-                child=child, is_completed=False
+ActivityAssignment.objects.filter(
+                child=self.child, is_completed=False
             ).values_list("activity_id", flat=True)
         )
 
         # Completed activity IDs and counts (for repetition logic)
         completed = (
-            ActivityCompletion.objects.filter(child=child)
+ActivityCompletion.objects.filter(child=self.child)
             .values("activity_id")
             .annotate(count=Count("id"))
             .order_by("-count")
@@ -61,11 +62,11 @@ class RecommendationEngine:
                 score += 20
 
             # Difficulty: match learning pace
-            if child.learning_pace == "slow" and activity.difficulty == "easy":
+            if self.learning_pace == "slow" and activity.difficulty == "easy":
                 score += 15
-            elif child.learning_pace == "medium":
+            elif self.learning_pace == "medium":
                 score += 10
-            elif child.learning_pace == "fast" and activity.difficulty in ("medium", "hard"):
+            elif self.learning_pace == "fast" and activity.difficulty in ("medium", "hard"):
                 score += 15
 
             # Repetition: completed 1-2 times gets bonus (reinforcement)

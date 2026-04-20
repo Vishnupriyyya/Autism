@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Assign Learning Modules{% endblock %}
+
+{% block content %}
+<h1>Assign Learning Modules</h1>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="child_id">Select Child:</label>
+        <select name="child_id" id="child_id" class="form-control" required>
+            <option value="">Choose a child...</option>
+            {% for child in children %}
+                <option value="{{ child.pk }}">{{ child.get_full_name }} (Age {{ child.get_age|default:'N/A' }})</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <h2>Available Activities</h2>
+    {% for module in activities|dictsort:"module__name" |groupby:"module" %}
+        <h3>{{ module.grouper.name }} ({{ module.grouper.category }})</h3>
+        <ul class="module-activities">
+            {% for activity in module.list %}
+                <li>
+                    <label>
+                        <input type="checkbox" name="activities" value="{{ activity.pk }}">
+                        {{ activity.title }} ({{ activity.difficulty }} - {{ activity.template_name }})
+                    </label>
+                </li>
+            {% endfor %}
+        </ul>
+    {% empty %}
+        <p>No activities available. Use admin to add modules/activities.</p>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary">Assign Selected Activities</button>
+</form>
+
+<a href="{% url 'children:parent_dashboard' %}" class="btn btn-secondary">← Back to Dashboard</a>
+
+<style>
+.form-group { margin-bottom: 2rem; }
+.form-control { width: 100%; padding: 0.5rem; }
+.module-activities { list-style: none; padding: 0; }
+.module-activities li { padding: 0.5rem; border-bottom: 1px solid #eee; }
+.module-activities label { cursor: pointer; display: block; }
+.btn { padding: 0.75rem 1.5rem; border-radius: 0.25rem; text-decoration: none; display: inline-block; }
+.btn-primary { background: #007bff; color: white; }
+.btn-secondary { background: #6c757d; color: white; }
+.alert { padding: 1rem; margin-bottom: 1rem; border-radius: 0.25rem; }
+.alert-success { background: #d4edda; color: #155724; }
+</style>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Child Progress Reports{% endblock %}
+
+{% block content %}
+<h1>Child Progress Reports</h1>
+
+{% for child in children %}
+<div class="child-progress-card">
+    <h3>{{ child.get_full_name }} ({{ child.get_age|default:'N/A' }} years)</h3>
+    <p>Skill Focus: {{ child.skill_focus|join:", " }}</p>
+    
+    <h4>Recent Completions</h4>
+    {% with completions=child.completions.all|slice:"5" %}
+        {% if completions %}
+            <ul>
+                {% for completion in completions %}
+                    <li>{{ completion.activity.title }} - Score: {{ completion.score|default:'-' }} - {{ completion.completed_at|date:"M d" }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No completions yet.</p>
+        {% endif %}
+    {% endwith %}
+    
+    <a href="{% url 'children:progress_report' child.pk %}" class="btn btn-primary">Detailed Report →</a>
+    <a href="{% url 'children:child_dashboard' child.pk %}" class="btn btn-secondary">Dashboard</a>
+</div>
+{% empty %}
+<p>No children. <a href="{% url 'children:child_create' %}">Add first child</a></p>
+{% endfor %}
+
+<a href="{% url 'children:parent_dashboard' %}" class="btn btn-back">← Back to Dashboard</a>
+
+<style>
+.child-progress-card { border: 1px solid #ddd; padding: 1.5rem; margin-bottom: 1rem; border-radius: 8px; }
+.btn { padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; margin-right: 0.5rem; }
+.btn-primary { background: #007bff; color: white; }
+.btn-secondary { background: #6c757d; color: white; }
+.btn-back { background: #28a745; color: white; }
+</style>
+{% endblock %}

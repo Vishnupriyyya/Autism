@@ -4,5 +4,6 @@ from . import views
 app_name = "recommendations"
 
 urlpatterns = [
+    path("", views.suggestions, name="suggestions"),
     path("child/<int:child_pk>/", views.get_recommendations, name="get_recommendations"),
 ]

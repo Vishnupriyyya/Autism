@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Personalized Suggestions{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/parent_dash.css' %}">
+<style>
+    .suggestions-container { display: flex; }
+    .suggestions-sidebar { width: 250px; background: #f8f9fa; padding: 2rem 1rem; }
+    .suggestions-content { flex: 1; padding: 2rem; }
+    .child-section { margin-bottom: 2rem; }
+    .child-header { background: var(--primary); color: white; padding: 1rem; border-radius: 8px 8px 0 0; }
+    .rec-card { background: white; border-radius: 8px; padding: 1rem; margin: 1rem 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .rec-title { font-weight: bold; margin-bottom: 0.5rem; }
+    .rec-meta { font-size: 0.875rem; color: #666; }
+    .start-btn { background: #4CAF50; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="suggestions-container">
+    <aside class="suggestions-sidebar">
+        <div class="logo">Sparkling Minds</div>
+        <nav>
+            <ul>
+<li><a href="/children/parent/">🏠 Dashboard</a></li>
+                <li><a href="{% url 'children:assign_modules' %}">📝 Assign Modules</a></li>
+                <li><a href="{% url 'children:progress_overview' %}">📈 Progress</a></li>
+                <li class="active"><a href="{% url 'recommendations:suggestions' %}">💡 Suggestions</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="suggestions-content">
+        <header>
+            <h1>💡 Personalized Learning Suggestions</h1>
+            <p>AI-powered recommendations based on your child's progress and preferences.</p>
+        </header>
+
+        {% for data in recommendations_data %}
+        <section class="child-section">
+            <div class="child-header">
+                <h3>{{ data.child.get_full_name }} ({{ data.child.get_age }} yrs)</h3>
+            </div>
+            <div class="rec-list">
+                {% for rec in data.recommendations %}
+                <div class="rec-card">
+                    <div class="rec-title">{{ rec.title }}</div>
+                    <div class="rec-meta">
+                        Module: {{ rec.module }} | Difficulty: {{ rec.difficulty }}
+                    </div>
+                    <a href="{% url 'learning:start_activity' rec.id %}" class="start-btn">Start Activity</a>
+                </div>
+                {% empty %}
+                <div class="rec-card">
+                    <p>No suggestions yet. Assign more modules or complete activities!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% empty %}
+        <div class="rec-card">
+            <p>Add children and assign modules to get personalized suggestions.</p>
+        </div>
+        {% endfor %}
+    </main>
+</div>
+{% endblock %}
+
