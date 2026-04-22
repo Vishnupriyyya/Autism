@@ -1,13 +1,77 @@
+<!DOCTYPE html>
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}{{ action }} Child Profile{% endblock %}
+{% block title %}{% if action %}{{ action }} Child Profile{% else %}Add Child Profile{% endif %} - Autism Learning Platform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/child_form.css' %}">
+{% endblock %}
 
 {% block content %}
-<h1>{{ action }} Child Profile</h1>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn">Save</button>
-</form>
-<p><a href="{% url 'children:parent_dashboard' %}">Cancel</a></p>
+<div class="container">
+    <h2>{% if action %}{{ action }}{% else %}Add{% endif %} Child Profile</h2>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Profile Photo -->
+        <div class="photo-box" id="photoBox">
+            {% if form.instance.avatar %}
+                <img src="{{ form.instance.avatar.url }}" alt="Profile photo">
+            {% else %}
+                No photo
+            {% endif %}
+        </div>
+        <input type="file" name="{{ form.avatar.html_name }}" id="{{ form.avatar.id_for_label }}" accept="image/jpeg,image/png">
+        <span class="small-text">Upload JPG or PNG (optional)</span>
+
+        <label>{{ form.first_name.label }}</label>
+        {{ form.first_name }}
+        
+        <label>{{ form.last_name.label }}</label>
+        {{ form.last_name }}
+        
+        <label>{{ form.date_of_birth.label }}</label>
+        {{ form.date_of_birth }}
+        
+        <label>Current Skill Level</label>
+        <select name="learning_pace" id="id_learning_pace">
+            <option value="slow" {% if form.learning_pace.value == 'slow' or form.instance.learning_pace == 'slow' %}selected{% endif %}>Beginner</option>
+            <option value="medium" {% if form.learning_pace.value == 'medium' or form.instance.learning_pace == 'medium' %}selected{% endif %}>Intermediate</option>
+            <option value="fast" {% if form.learning_pace.value == 'fast' or form.instance.learning_pace == 'fast' %}selected{% endif %}>Advanced</option>
+        </select>
+
+        <label>Skill Focus Areas (optional)</label>
+        <div style="background: #f9f9f9; padding: 10px; border-radius: 10px;">
+            {{ form.skill_focus }}
+        </div>
+
+        <!-- Buttons -->
+        <div class="btn-group">
+            <button type="submit" class="btn btn-save">Save Profile</button>
+            <a href="{% url 'children:parent_dashboard' %}" class="btn btn-cancel">Cancel</a>
+        </div>
+
+        {{ form.avatar.errors }}
+        {{ form.non_field_errors }}
+    </form>
+</div>
+
+<script>
+document.getElementById('{{ form.avatar.id_for_label }}').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const photoBox = document.getElementById('photoBox');
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            photoBox.innerHTML = '<img src="' + e.target.result + '" alt="Preview">';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        photoBox.innerHTML = '{% if form.instance.avatar %}<img src="{{ form.instance.avatar.url }}" alt="Profile photo">{% else %}No photo{% endif %}';
+    }
+});
+</script>
+
 {% endblock %}

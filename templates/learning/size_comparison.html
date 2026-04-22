@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Size Comparison Game{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/game.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/game.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <div class="header">
+        <span>Size Comparison</span>
+        <div class="stars">☆☆☆</div>
+    </div>
+    
+    <div class="task-prompt">Tap the BIG animal!</div>
+
+    <div class="game-board">
+        <div class="animal" onclick="checkAnswer(true)">
+            <img src="{% static 'images/elephant.png' %}" alt="Elephant" style="width: 150px; height: 150px;">
+        </div>
+        
+        <div class="animal" onclick="checkAnswer(false)">
+            <img src="{% static 'images/mouse.png' %}" alt="Mouse" style="width: 50px; height: 50px;">
+        </div>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+    
+    <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px;">Next Question</button>
+</div>
+{% endblock %}

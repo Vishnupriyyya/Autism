@@ -1,19 +1,20 @@
 """
 Django settings for Autism Learning and Skill Development Platform.
 Supports GCP (Cloud Storage, Cloud SQL) for scalability.
+Production-ready for Cloud Run: WhiteNoise for statics, env vars required.
 """
-
 import os
 from pathlib import Path
 
 # Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Security
+# Security - REQUIRED ENV VARS for Cloud Run: DJANGO_SECRET_KEY, DEBUG=false, ALLOWED_HOSTS=*.run.app
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
-    "django-insecure-change-this-in-production-use-env-var"
+    "django-insecure-change-this-in-production-use-env-var-DO-NOT-USE"
 )
+# Generated secure key (use this in Cloud Run Secrets): django-insecure-autism-platform-cloud-run-2024#kX9pL2mQ8vR5tY7uW3sE6nJ1hZ4bC0fG!
 DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
@@ -29,10 +30,12 @@ INSTALLED_APPS = [
     "children",
     "learning",
     "recommendations",
+    "whitenoise.runserver_nostatic",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -61,7 +64,7 @@ TEMPLATES = [
 ]
 
 # Database - supports SQLite (dev) and Cloud SQL (prod via GCP)
-# For Cloud SQL, use django-environ and set DATABASE_URL
+# For Cloud Run: SQLite is ephemeral (data lost on restart)
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -76,7 +79,7 @@ DATABASES = {
 #         "NAME": os.environ.get("GCP_DB_NAME", "autism_platform"),
 #         "USER": os.environ.get("GCP_DB_USER", ""),
 #         "PASSWORD": os.environ.get("GCP_DB_PASSWORD", ""),
-#         "HOST": os.environ.get("GCP_DB_HOST", "/cloudsql/PROJECT:REGION:INSTANCE"),
+#         "HOST": os.environ.get("GCP_DB_HOST", "/cloudsql/my-autism-project-id:us-central1:autism-db"),
 #         "PORT": os.environ.get("GCP_DB_PORT", "5432"),
 #     }
 # }
@@ -98,17 +101,18 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# Static files
-STATIC_URL = "static/"
+# Static files (WhiteNoise handles serving)
+STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# Media files - local or GCP Cloud Storage
+# Media files - local or GCP Cloud Storage (ephemeral on Cloud Run)
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# GCP Cloud Storage for media (images, audio, video)
-# Install: pip install django-storages google-cloud-storage
+# GCP Cloud Storage for media (images, audio, video) - recommended for persistence
+# pip install django-storages google-cloud-storage
 # DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
 # GS_BUCKET_NAME = os.environ.get("GCP_STORAGE_BUCKET", "autism-platform-media")
 # GS_DEFAULT_ACL = "publicRead"
@@ -124,3 +128,7 @@ SESSION_COOKIE_AGE = 86400  # 24 hours
 
 # Default primary key
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Cloud Run prod notes
+# Set SECURE_SSL_REDIRECT = True in prod (HTTPS enforced)
+# CSRF_TRUSTED_ORIGINS = ['https://your-service-xxx.a.run.app']

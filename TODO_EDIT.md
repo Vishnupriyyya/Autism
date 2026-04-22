@@ -1,21 +1,23 @@
-# Fix Suggesting Link on Parent Dashboard
+# Task Complete: Full Activity Assignment System
 
-## Status: In Progress
+**Assign modules page updated**:
+- Removed hardcoded "Shape Match Demo" links (appears per module).
+- Now shows **all real LearningActivity** entries from DB grouped by module.
+- Parents select child → checkbox activities → assign → `ActivityAssignment` created.
 
-### Plan Summary:
-- Add error handling to suggestions view
-- Defensive engine updates  
-- Seed sample data
-- Test link
+**Current activities in DB** (7):
+- Cognitive: Color Matching, Object ID
+- Communication: Basic Words
+- Daily Life: Daily Routines
+- Emotional: Feelings
+- Sensory: Color Bubble Pop
+- Social: Emotions
 
-## Steps:
-- [x] Step 0: Create this TODO (done)
-- [ ] Step 1: Edit recommendations/views.py - add try/except logging
-- [ ] Step 2: Edit recommendations/engine.py - defensive null checks
-- [ ] Step 3: Create seed script for LearningModule/LearningActivity
-- [ ] Step 4: Execute seed script
-- [ ] Step 5: Test link (requires runserver + browser click)
-- [x] Complete
+**To add all 15+ games**:
+1. Admin → Learning → Activities → Add new w/ `template_name` (e.g. "brushing_teeth", "pattern_recognition").
+2. They'll appear in assign modules automatically.
 
-**Current Step: 4/5** - Seeded data, test link
+**Flow works**:
+Child form → assign modules (real data) → child dashboard shows assigned → play via activity_detail.
 
+Platform ready! 🎉

@@ -1,19 +1,128 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Object Identification</title>
-</head>
-<body>
-    <h1>Object Identification</h1>
+{% extends "base.html" %}
+{% load static %}
 
-    <p>Identify the object shown and select the correct name.</p>
+{% block title %}Object Identification - Communication Game{% endblock %}
 
-    <p>🖊️ Pen &nbsp;&nbsp; 🍎 Apple &nbsp;&nbsp; 🚗 Car</p>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/object_identification.css' %}">
+<link rel="stylesheet" href="{% static 'css/game.css' %}">
+{% endblock %}
 
-    <p>(Audio and interaction will be added later)</p>
-    <br>
-    <a href="/activity-completed">✔ Complete Activity</a>
-    <br>
-    <a href="/child">⬅ Back to Child Dashboard</a>
-</body>
-</html>
+{% block content %}
+<div class="game-container">
+    <div class="header">
+        Communication & Language: Object Identification
+        <div class="stars">☆☆☆</div>
+    </div>
+    
+    <div class="instruction">Click 🔊 to hear, then click correct object!</div>
+
+    <div class="game-board">
+        <div class="object-row">
+            <div class="item" onclick="selectObject('red_ball')">
+                <img src="{% static 'images/ball.svg' %}" id="red_ball" class="game-object">
+                <span class="audio-icon" onclick="playAudio('red_ball')">🔊</span>
+                <span class="object-label">Red Ball</span>
+            </div>
+            <div class="item" onclick="selectObject('blue_cloud')">
+                <img src="{% static 'images/cloud.svg' %}" id="blue_cloud" class="game-object">
+                <span class="audio-icon" onclick="playAudio('blue_cloud')">🔊</span>
+                <span class="object-label">Blue Cloud</span>
+            </div>
+            <div class="item" onclick="selectObject('green_tree')">
+                <img src="{% static 'images/tree.svg' %}" id="green_tree" class="game-object">
+                <span class="audio-icon" onclick="playAudio('green_tree')">🔊</span>
+                <span class="object-label">Green Tree</span>
+            </div>
+        </div>
+
+        <div class="task-buttons">
+            <button class="task-btn" onclick="checkMatch('red_ball')">🔴 Find the RED BALL</button>
+            <button class="task-btn" onclick="checkMatch('blue_cloud')">☁️ Find the BLUE CLOUD</button>
+            <button class="task-btn" onclick="checkMatch('green_tree')">🌳 Find the GREEN TREE</button>
+        </div>
+    </div>
+    
+    <div id="feedback" class="feedback-bubble"></div>
+    
+    <canvas id="lineCanvas" style="position: fixed; pointer-events: none; z-index: 100;"></canvas>
+</div>
+
+<script>
+let currentTask = ['red_ball', 'blue_cloud', 'green_tree'][Math.floor(Math.random() * 3)];
+let lineDrawing = null;
+
+const audioClips = {
+    'red_ball': new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fd...'), // base64 short beep
+    'blue_cloud': new Audio('data:audio/wav;base64,UklGRiQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fd...'),
+    'green_tree': new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fd...')
+};
+
+function playAudio(objectId) {
+    if (audioClips[objectId]) {
+        audioClips[objectId].currentTime = 0;
+        audioClips[objectId].play().catch(e => console.log('Audio play failed'));
+    }
+}
+
+function selectObject(objectId) {
+    document.querySelectorAll('.item').forEach(item => item.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+}
+
+function checkMatch(selectedObjectId) {
+    const feedback = document.getElementById('feedback');
+    const objectElement = document.getElementById(selectedObjectId);
+    const buttonElement = event.target;
+    
+    if (selectedObjectId === currentTask) {
+        feedback.innerHTML = "Perfect identification! 🎉✨";
+        feedback.className = 'feedback-bubble success';
+        
+        // Draw animated line
+        drawConnectionLine(objectElement, buttonElement);
+        
+        confettiEffect();
+        setTimeout(() => location.reload(), 3500);
+    } else {
+        feedback.innerHTML = "Listen again to the instruction!";
+        feedback.className = 'feedback-bubble error';
+        setTimeout(() => feedback.innerHTML = '', 2000);
+    }
+}
+
+function drawConnectionLine(fromEl, toEl) {
+    const canvas = document.getElementById('lineCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    const fromRect = fromEl.getBoundingClientRect();
+    const toRect = toEl.getBoundingClientRect();
+    
+    const fromX = fromRect.left + fromRect.width / 2;
+    const fromY = fromRect.top + fromRect.height / 2;
+    const toX = toRect.left + toRect.width / 2;
+    const toY = toRect.top + toRect.height / 2;
+    
+    // Dashed celebrating line
+    ctx.lineWidth = 6;
+    ctx.setLineDash([10, 10]);
+    ctx.strokeStyle = '#00b894';
+    ctx.lineCap = 'round';
+    
+    ctx.beginPath();
+    ctx.moveTo(fromX, fromY);
+    ctx.lineTo(toX, toY);
+    ctx.stroke();
+    
+    ctx.setLineDash([]);
+    setTimeout(() => ctx.clearRect(0, 0, canvas.width, canvas.height), 3000);
+}
+
+// Initialize random task
+document.addEventListener('DOMContentLoaded', () => {
+    playAudio(currentTask); // Auto-play first instruction
+});
+</script>
+{% endblock %}

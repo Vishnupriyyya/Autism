@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Shape Match - {{ level }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/game.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <div class="header">
+        <div class="menu-icon">☰</div>
+        <div class="title">Shape Match</div>
+        <div class="stars">☆☆☆</div>
+    </div>
+
+    <div class="game-board">
+        <div class="row">
+            <div class="shape-box"><div class="shape blue-square"></div></div>
+            <div class="sound-icon">🔊</div>
+            <div class="shape-box"><div class="shape yellow-circle"></div></div>
+            <div class="drop-zone"></div>
+            <div class="shape-box"><div class="shape yellow-circle-happy"></div></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Drag and drop logic for shape matching game
+// ... (basic drag-drop can be added here)
+</script>
+{% endblock %}

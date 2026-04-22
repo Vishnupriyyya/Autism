@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Object Sorting Game{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/sorting.css' %}">
+<link rel="stylesheet" href="{% static 'css/game.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <div class="header">
+        <span>Object Sorting</span>
+        <div class="stars">☆☆☆</div>
+    </div>
+    
+    <div class="task-prompt">Drag the fruits into the basket!</div>
+
+    <div class="items-row" style="display: flex; justify-content: center; gap: 30px; margin: 30px 0;">
+        <img src="{% static 'images/apple.svg' %}" id="item1" class="draggable" draggable="true" ondragstart="drag(event)" alt="Apple" style="width: 80px; height: 80px;">
+        <img src="{% static 'images/banana.png' %}" id="item2" class="draggable" draggable="true" ondragstart="drag(event)" alt="Banana" style="width: 80px; height: 80px;">
+        <img src="{% static 'images/car.svg' %}" id="item3" class="draggable" draggable="true" ondragstart="drag(event)" alt="Car" style="width: 80px; height: 80px;">
+    </div>
+
+    <div class="baskets-row">
+        <div class="basket" id="fruits" ondrop="drop(event)" ondragover="allowDrop(event)">🍎 Fruits</div>
+        <div class="basket" id="toys" ondrop="drop(event)" ondragover="allowDrop(event)">🚗 Toys</div>
+    </div>
+    
+    <div class="feedback" id="feedback" style="margin-top: 30px; font-weight: bold;"></div>
+</div>
+
+<script>
+function allowDrop(ev) { ev.preventDefault(); }
+
+function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+
+function drop(ev) {
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("text");
+    var item = document.getElementById(data);
+    
+    var feedback = document.getElementById('feedback');
+    
+    if (ev.target.id === "fruits" && (data === "item1" || data === "item2")) {
+        ev.target.appendChild(item);
+        item.style.margin = "10px";
+        feedback.innerHTML = "Correct! 🎉";
+        feedback.style.color = "green";
+    } else if (ev.target.id === "toys" && data === "item3") {
+        ev.target.appendChild(item);
+        item.style.margin = "10px";
+        feedback.innerHTML = "Correct! 🎉";
+        feedback.style.color = "green";
+    } else {
+        feedback.innerHTML = "Try again! 🧐";
+        feedback.style.color = "orange";
+        setTimeout(() => feedback.innerHTML = '', 2000);
+    }
+}
+</script>
+{% endblock %}

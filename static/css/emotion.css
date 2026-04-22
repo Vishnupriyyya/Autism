@@ -1,0 +1,150 @@
+.emotion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 20px;
+    justify-content: center;
+    margin: 30px 0;
+    max-width: 400px;
+}
+
+.face {
+    width: 90px;
+    height: 90px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #dee2e6;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.face:hover {
+    transform: translateY(-5px) scale(1.05);
+    border-color: #2fbdbb;
+    box-shadow: 0 8px 25px rgba(47, 189, 187, 0.3);
+}
+
+.face img {
+    border-radius: 15px;
+    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+}
+
+.task-prompt {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.task-prompt h2 {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+}
+
+.question {
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-align: center;
+    color: #495057;
+    margin: 25px 0;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.btn-emotion {
+    width: 110px;
+    height: 110px;
+    border-radius: 55px;
+    background: linear-gradient(135deg, #2fbdbb 0%, #1abc9c 100%);
+    color: white;
+    border: none;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 6px 20px rgba(47, 189, 187, 0.4);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    letter-spacing: 0.5px;
+}
+
+.btn-emotion:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(47, 189, 187, 0.6);
+}
+
+.btn-emotion:active {
+    transform: scale(0.95) translateY(-1px);
+    background: linear-gradient(135deg, #237a7a, #1e6b5b);
+}
+
+.btn-emotion.correct {
+    animation: bounce 0.6s;
+    background: linear-gradient(135deg, #00b894, #00a085);
+}
+
+.btn-emotion.wrong {
+    animation: shake 0.5s;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-15px); }
+    60% { transform: translateY(-8px); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.feedback {
+    font-size: 1.3rem;
+    font-weight: bold;
+    min-height: 50px;
+    text-align: center;
+    margin-top: 30px;
+    padding: 15px;
+    border-radius: 15px;
+    transition: all 0.3s;
+}
+
+.feedback.success {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    color: #155724;
+    border: 2px solid #28a745;
+}
+
+.feedback.error {
+    background: linear-gradient(135deg, #f8d7da, #f1b0b7);
+    color: #721c24;
+    border: 2px solid #dc3545;
+}
+
+@media (max-width: 768px) {
+    .emotion-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .btn-emotion {
+        width: 140px;
+        height: 140px;
+        font-size: 1.1rem;
+    }
+}

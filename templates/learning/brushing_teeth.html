@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Daily Life: Brushing Teeth{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/game.css' %}">
+<link rel="stylesheet" href="{% static 'css/daily.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <div class="header">
+        <span>Daily Life Skills</span>
+        <div class="stars">☆☆☆</div>
+    </div>
+    
+    <div class="task-prompt">
+        <h2>Brushing Teeth</h2>
+        <p>Tap steps in correct order!</p>
+    </div>
+
+    <div class="step-sequence">
+        <div class="step-card" data-step="1">
+            <img src="{% static 'images/toothbrush.png' %}" alt="Get toothbrush">
+            <div class="step-label">1. Get toothbrush & paste</div>
+        </div>
+        <div class="step-card" data-step="2">
+            <img src="{% static 'images/toothpaste.png' %}" alt="Put paste">
+            <div class="step-label">2. Put toothpaste on brush</div>
+        </div>
+        <div class="step-card" data-step="3">
+            <img src="{% static 'images/brushing.png' %}" alt="Brush">
+            <div class="step-label">3. Brush all teeth</div>
+        </div>
+        <div class="step-card" data-step="4">
+            <img src="{% static 'images/rinse.png' %}" alt="Rinse">
+            <div class="step-label">4. Rinse mouth</div>
+        </div>
+        <div class="step-card" data-step="5">
+            <img src="{% static 'images/clean.png' %}" alt="Put away">
+            <div class="step-label">5. Put away brush</div>
+        </div>
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+    </div>
+
+    <div id="feedback" class="feedback-bubble"></div>
+</div>
+
+<script>
+const correctOrder = [1,2,3,4,5];
+let completedSteps = new Set();
+let currentStep = 1;
+
+document.querySelectorAll('.step-card').forEach(card => {
+    card.onclick = () => checkStep(card.dataset.step);
+});
+
+function checkStep(stepNum) {
+    const feedback = document.getElementById('feedback');
+    const card = event.currentTarget;
+    
+    if (parseInt(stepNum) === currentStep) {
+        completedSteps.add(stepNum);
+        card.classList.add('completed');
+        currentStep++;
+        
+        updateProgress();
+        feedback.innerHTML = `Great! Step ${stepNum} ✓`;
+        feedback.className = 'feedback-bubble feedback-success';
+        
+        if (currentStep > 5) {
+            feedback.innerHTML = "Perfect brushing! 🦷✨";
+            confettiEffect();
+        }
+    } else {
+        feedback.innerHTML = `Do step ${currentStep} first!`;
+        feedback.className = 'feedback-bubble feedback-error';
+        setTimeout(() => feedback.className = 'feedback-bubble feedback-success', 2000);
+    }
+}
+
+function updateProgress() {
+    const progress = (completedSteps.size / 5) * 100;
+    document.getElementById('progress-fill').style.width = progress + '%';
+}
+</script>
+{% endblock %}

@@ -1,11 +1,31 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Cognitive Development</title>
-</head>
-<body>
-    <h1>Cognitive Development</h1>
-    <p>Improves memory, matching, and problem-solving skills.</p>
-    <a href="/">⬅ Back to Home</a>
-</body>
-</html>
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Cognitive Skills - Autism Learning Platform{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; margin: 40px auto; padding: 20px;">
+    <h1>Cognitive Development Activities</h1>
+    <p>Fun games to improve memory, matching, problem-solving, and shape recognition skills.</p>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 30px;">
+        <a href="{% url 'learning:shape_match' %}" class="activity-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 15px; text-decoration: none; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.15);">
+            <h3>🎲 Shape Match</h3>
+            <p>Drag shapes to matching zones!</p>
+        </a>
+        
+        <a href="/learning/activity/3/?child=1" class="activity-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 25px; border-radius: 15px; text-decoration: none; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.15);">
+            <h3>🌈 Color Match</h3>
+            <p>Match colors and pop bubbles!</p>
+        </a>
+        
+        <a href="/learning/activity/1/?child=1" class="activity-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 25px; border-radius: 15px; text-decoration: none; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.15);">
+            <h3>📦 Object Identification</h3>
+            <p>Find and identify everyday objects.</p>
+        </a>
+    </div>
+    
+    <a href="{% url 'children:parent_dashboard' %}" style="display: inline-block; margin-top: 30px; padding: 12px 24px; background: #6c757d; color: white; text-decoration: none; border-radius: 8px;">← Back to Dashboard</a>
+</div>
+{% endblock %}

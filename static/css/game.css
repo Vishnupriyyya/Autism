@@ -1,0 +1,213 @@
+/* Universal Game Base CSS - Consistent "Sparkling Minds" design */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, #f0f4f7 0%, #e3f2fd 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+.game-container {
+    background: #ffffff;
+    border-radius: 25px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    max-width: 850px;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+}
+
+.header {
+    background: linear-gradient(135deg, #2fbdbb 0%, #1abc9c 100%);
+    color: white;
+    padding: 22px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    position: relative;
+}
+
+.header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ffeb3b, #ffd700, #ffeb3b);
+}
+
+.menu {
+    font-size: 1.8rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.menu:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.stars {
+    font-size: 1.5rem;
+    animation: sparkle 2s infinite alternate;
+}
+
+@keyframes sparkle {
+    0% { text-shadow: 0 0 5px #ffd700; }
+    100% { text-shadow: 0 0 20px #ffd700, 0 0 30px #ffeb3b; }
+}
+
+.task-prompt {
+    padding: 25px 40px;
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #2c3e50;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 4px solid #2fbdbb;
+}
+
+.game-board { 
+    padding: 50px 40px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 40px;
+    min-height: 400px;
+}
+
+/* Universal interactive elements */
+.shape, .animal, .object, .item {
+    width: 80px;
+    height: 80px;
+    border-radius: 18px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.shape:hover, .animal:hover, .object:hover, .item:hover {
+    transform: translateY(-8px) scale(1.08);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+}
+
+/* Selected state */
+.selected {
+    border: 4px solid #2fbdbb !important;
+    box-shadow: 0 0 0 4px rgba(47, 189, 187, 0.3) !important;
+    animation: selectedPulse 1.5s infinite;
+}
+
+@keyframes selectedPulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(47, 189, 187, 0.3); }
+    50% { box-shadow: 0 0 0 8px rgba(47, 189, 187, 0.2); }
+}
+
+/* Universal buttons */
+.task-btn, .word-btn, .btn-emotion {
+    padding: 18px 30px;
+    border: none;
+    border-radius: 22px;
+    font-weight: 700;
+    font-size: 1.15rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 6px 20px rgba(47, 189, 187, 0.4);
+    letter-spacing: 0.8px;
+    position: relative;
+    min-width: 200px;
+    background: linear-gradient(135deg, #2fbdbb 0%, #1abc9c 100%);
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.task-btn:hover, .word-btn:hover, .btn-emotion:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(47, 189, 187, 0.6);
+}
+
+.task-btn:active, .word-btn:active, .btn-emotion:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+/* Feedback bubbles */
+.feedback-bubble {
+    margin-top: 35px;
+    padding: 25px 40px;
+    border-radius: 25px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    min-height: 70px;
+    transition: all 0.4s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.feedback-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border: 3px solid #28a745;
+    animation: successPop 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.feedback-error {
+    background: linear-gradient(135deg, #f8d7da 0%, #f1b0b7 100%);
+    color: #721c24;
+    border: 3px solid #dc3545;
+    animation: shake 0.6s;
+}
+
+@keyframes successPop {
+    0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+    60% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    body { padding: 10px; }
+    
+    .game-container {
+        margin: 10px;
+        border-radius: 20px;
+    }
+    
+    .header {
+        font-size: 1.3rem;
+        padding: 18px 20px;
+    }
+    
+    .game-board {
+        padding: 30px 20px;
+        gap: 25px;
+    }
+    
+    .task-btn, .word-btn, .btn-emotion {
+        width: 100%;
+        max-width: 300px;
+        padding: 16px 20px;
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .shape, .animal, .object, .item {
+        width: 65px;
+        height: 65px;
+    }
+}

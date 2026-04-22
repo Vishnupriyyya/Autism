@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Pattern Recognition Game{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pattern.css' %}">
+<link rel="stylesheet" href="{% static 'css/game.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <div class="header">
+        <span>Pattern Recognition</span>
+        <div class="stars">☆☆☆</div>
+    </div>
+    
+    <div class="task-prompt">Complete the pattern!</div>
+
+    <div class="pattern-board">
+        <div class="pattern-sequence">
+            <div class="shape star"></div>
+            <div class="shape moon"></div>
+            <div class="shape moon"></div>
+            <div class="shape heart"></div>
+            <div class="shape heart"></div>
+            <div class="drop-zone">?</div>
+        </div>
+
+        <div class="options">
+            <div class="option" onclick="checkAnswer('heart')">
+                <div class="shape heart"></div>
+            </div>
+            <div class="option" onclick="checkAnswer('star')">
+                <div class="shape star"></div>
+            </div>
+            <div class="option" onclick="checkAnswer('tree')">
+                <div class="shape tree"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="feedback" id="feedback"></div>
+</div>
+
+<script>
+function checkAnswer(shapeType) {
+    const dropZone = document.querySelector('.drop-zone');
+    const feedback = document.getElementById('feedback');
+    
+    if (shapeType === 'heart') {
+        dropZone.innerHTML = '<div class="shape heart"></div>';
+        feedback.innerHTML = "Perfect! You found the pattern! 🎉";
+        feedback.style.color = "green";
+        confettiEffect();
+        setTimeout(() => location.reload(), 2500);
+    } else {
+        feedback.innerHTML = "Not quite. Look for the repeating pattern!";
+        feedback.style.color = "orange";
+        setTimeout(() => feedback.innerHTML = '', 2500);
+    }
+}
+
+function confettiEffect() {
+    // Confetti from game.js (assume available)
+    for (let i = 0; i < 30; i++) {
+        setTimeout(() => {
+            const star = document.createElement('div');
+            star.textContent = '⭐';
+            star.style.position = 'fixed';
+            star.style.left = Math.random() * 100 + 'vw';
+            star.style.top = '-10%';
+            star.style.fontSize = '20px';
+            star.style.pointerEvents = 'none';
+            star.style.animation = 'fall 2s linear forwards';
+            document.body.appendChild(star);
+            setTimeout(() => star.remove(), 2000);
+        }, i * 50);
+    }
+}
+</script>
+
+<style>
+@keyframes fall {
+    to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+</style>
+{% endblock %}

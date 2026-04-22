@@ -1,0 +1,117 @@
+/* Styling for a beautiful, modern card layout */
+body {
+    background-color: #f4f7f6; /* Soft, clean background */
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: #333;
+}
+
+.container {
+    background: #ffffff;
+    padding: 3rem;
+    border-radius: 20px; /* Modern rounded corners */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08); /* Soft floating effect */
+    max-width: 500px;
+    margin: 50px auto;
+}
+
+h2 {
+    color: #2c3e50;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+label { 
+    font-weight: 600; 
+    color: #555; 
+    margin-top: 1rem; 
+    display: block; 
+}
+
+input[type="text"], input[type="date"], input[type="file"], select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    border: 2px solid #e1e1e1;
+    border-radius: 10px;
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+}
+
+input:focus, select:focus { 
+    border-color: #208e8e; 
+    outline: none; 
+}
+
+.photo-box {
+    width: 120px;
+    height: 120px;
+    border: 3px dashed #cbd5e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%; /* Circular avatar area */
+    margin: 0 auto 1rem;
+    background: #f8fafc;
+    color: #a0aec0;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.photo-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.btn-group { 
+    display: flex; 
+    gap: 15px; 
+    margin-top: 2rem; 
+}
+
+.btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s, background 0.3s;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-save { 
+    background: #208e8e; 
+    color: white; 
+}
+.btn-save:hover { 
+    background: #1a7373; 
+    transform: translateY(-2px); 
+}
+
+.btn-cancel { 
+    background: #edf2f7; 
+    color: #4a5568; 
+}
+
+.small-text {
+    font-size: 0.875rem;
+    color: #666;
+    display: block;
+    margin-top: 0.25rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        margin: 20px;
+        padding: 2rem 1.5rem;
+    }
+    .btn-group {
+        flex-direction: column;
+    }
+}

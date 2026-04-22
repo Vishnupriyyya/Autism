@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Picture-to-Word Matching{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/matching.css' %}">
+<link rel="stylesheet" href="{% static 'css/game.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <div class="header">
+        <span>Picture-to-Word Matching</span>
+        <div class="stars">☆☆☆</div>
+    </div>
+    
+    <div class="instruction">Click a picture, then click the matching word!</div>
+
+    <div class="game-board">
+        <div class="column">
+            <div class="item-box">
+                <img src="{% static 'images/apple.svg' %}" id="apple-img" class="match-img" onclick="selectImage('apple')" alt="Apple">
+            </div>
+            <div class="item-box">
+                <img src="{% static 'images/banana.svg' %}" id="banana-img" class="match-img" onclick="selectImage('banana')" alt="Banana">
+            </div>
+            <div class="item-box">
+                <img src="{% static 'images/book.svg' %}" id="book-img" class="match-img" onclick="selectImage('book')" alt="Book">
+            </div>
+        </div>
+        
+        <div class="column">
+            <button class="word-btn" onclick="checkMatch('apple')">🍎 APPLE</button>
+            <button class="word-btn" onclick="checkMatch('banana')">🍌 BANANA</button>
+            <button class="word-btn" onclick="checkMatch('book')">📚 BOOK</button>
+        </div>
+    </div>
+    
+    <div id="feedback" class="feedback-bubble"></div>
+</div>
+
+<script>
+let selectedImage = null;
+
+function selectImage(imgId) {
+    // Clear previous selection
+    document.querySelectorAll('.match-img').forEach(img => {
+        img.style.border = '3px solid transparent';
+        img.style.transform = 'scale(1)';
+    });
+    
+    // Highlight selected
+    const img = document.getElementById(imgId + '-img');
+    img.style.border = '3px solid #2fbdbb';
+    img.style.transform = 'scale(1.05)';
+    
+    selectedImage = imgId;
+}
+
+function checkMatch(word) {
+    const feedback = document.getElementById('feedback');
+    
+    if (selectedImage === word) {
+        feedback.innerHTML = "Perfect match! 🎉⭐";
+        feedback.style.color = "#00b894";
+        feedback.style.fontSize = "1.5rem";
+        document.querySelectorAll('.word-btn, .match-img').forEach(el => el.style.pointerEvents = 'none');
+        confettiEffect();
+        setTimeout(() => location.reload(), 3000);
+    } else if (selectedImage) {
+        feedback.innerHTML = "Not a match! Try another word.";
+        feedback.style.color = "#e74c3c";
+        setTimeout(() => {
+            feedback.innerHTML = '';
+        }, 2000);
+    } else {
+        feedback.innerHTML = "First click a picture!";
+        feedback.style.color = "orange";
+        setTimeout(() => feedback.innerHTML = '', 1500);
+    }
+}
+</script>
+{% endblock %}

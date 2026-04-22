@@ -12,4 +12,5 @@ urlpatterns = [
     path("modules/", views.module_list, name="module_list"),
     path("activity/<int:pk>/", views.activity_detail, name="activity_detail"),
     path("complete/", views.complete_activity, name="complete_activity"),
+    path("shape-match/", views.shape_match_view, name="shape_match"),
 ]

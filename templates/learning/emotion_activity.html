@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Emotional Recognition - Autism Learning{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/emotion.css' %}">
+<link rel="stylesheet" href="{% static 'css/game.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <div class="header">
+        <span>Emotional Recognition Activity</span>
+        <div class="stars">☆☆☆</div>
+    </div>
+    
+    <div class="task-prompt">
+        <h2>Identifying Emotions</h2>
+        <p>From Facial Expressions</p>
+    </div>
+
+    <div class="emotion-grid">
+        <div class="face" data-emotion="happy">
+            <img src="{% static 'images/happy.svg' %}" alt="Happy face" style="width: 70px; height: 70px;">
+        </div>
+        <div class="face" data-emotion="sad">
+            <img src="{% static 'images/sad.svg' %}" alt="Sad face" style="width: 70px; height: 70px;">
+        </div>
+        <div class="face" data-emotion="angry">
+            <img src="{% static 'images/angry.svg' %}" alt="Angry face" style="width: 70px; height: 70px;">
+        </div>
+        <div class="face" data-emotion="surprised">
+            <img src="{% static 'images/surprised.svg' %}" alt="Surprised face" style="width: 70px; height: 70px;">
+        </div>
+        <div class="face" data-emotion="scared">
+            <img src="{% static 'images/scared.svg' %}" alt="Scared face" style="width: 70px; height: 70px;">
+        </div>
+    </div>
+
+    <div class="question">Which face is <span id="targetEmotion" style="color: #2fbdbb; font-weight: bold;">HAPPY</span>?</div>
+
+    <div class="btn-group" style="display: flex; justify-content: center; gap: 15px; margin-top: 30px;">
+        <button class="btn btn-emotion" onclick="checkAnswer('happy')">😊 Happy</button>
+        <button class="btn btn-emotion" onclick="checkAnswer('sad')">😢 Sad</button>
+        <button class="btn btn-emotion" onclick="checkAnswer('angry')">😠 Angry</button>
+    </div>
+    
+    <div class="feedback" id="feedback" style="margin-top: 25px; font-size: 1.2rem; min-height: 40px;"></div>
+</div>
+
+<script>
+function checkAnswer(emotion) {
+    const feedback = document.getElementById('feedback');
+    const buttons = document.querySelectorAll('.btn-emotion');
+    const correctEmotion = document.getElementById('targetEmotion').textContent.toLowerCase();
+    
+    buttons.forEach(btn => btn.disabled = true);
+    
+    if (emotion === correctEmotion) {
+        feedback.innerHTML = "Excellent! That's the happy face! 🎉⭐⭐⭐";
+        feedback.style.color = "green";
+        feedback.style.fontSize = "1.3rem";
+        confettiEffect();
+        setTimeout(() => location.reload(), 3500);
+    } else {
+        feedback.innerHTML = `No, that's ${emotion}. Keep looking for the ${correctEmotion} face! 🔍`;
+        feedback.style.color = "orange";
+        setTimeout(() => {
+            feedback.innerHTML = '';
+            buttons.forEach(btn => btn.disabled = false);
+        }, 3000);
+    }
+}
+</script>
+{% endblock %}

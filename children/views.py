@@ -2,6 +2,7 @@
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.http import JsonResponse
 
 from .models import ChildProfile, ActivityAssignment
@@ -21,7 +22,7 @@ def parent_dashboard(request):
     assignments = ActivityAssignment.objects.filter(child__parent=request.user).select_related(
         "activity__module"
     )
-    module_stats: dict = {}
+    module_stats = {}
     for a in assignments:
         mod = a.activity.module
         stats = module_stats.setdefault(mod.pk, {"name": mod.name, "total": 0, "completed": 0})
@@ -75,7 +76,6 @@ def parent_dashboard(request):
 
 
 @parent_required
-
 def child_create(request):
     """Create a new child profile."""
     form = ChildProfileForm(request.POST or None, request.FILES or None)
@@ -104,7 +104,7 @@ def child_dashboard(request, pk):
     child = get_object_or_404(ChildProfile, pk=pk)
     # Only parent can access child dashboard (or we could add PIN later)
     if not request.user.is_parent or child.parent != request.user:
-        if request.user.is_administrator:
+        if hasattr(request.user, 'is_administrator') and request.user.is_administrator:
             pass  # Admin can view any
         else:
             return redirect("accounts:role_redirect")
@@ -121,7 +121,7 @@ def child_dashboard(request, pk):
     all_activities = (
         LearningActivity.objects.filter(is_active=True)
         .select_related("module")
-        .order_by("module__name", "order", "title")
+        .order_by("module__name", "module__order", "title")
     )
 
     return render(
@@ -152,7 +152,6 @@ def progress_report(request, pk):
 
 
 @parent_required
-
 def toggle_module(request):
     """AJAX endpoint to toggle module visibility state for this parent.
 
@@ -172,6 +171,7 @@ def toggle_module(request):
 
 @parent_required
 def assign_modules(request):
+    """Assign activities to child."""
     children = ChildProfile.objects.filter(parent=request.user).order_by('first_name')
     activities = LearningActivity.objects.filter(is_active=True).select_related('module').order_by('module__name', 'module__order', 'order')
     
@@ -189,8 +189,12 @@ def assign_modules(request):
         else:
             messages.error(request, 'Please select a child.')
     
-    context = {'children': children, 'activities': activities}
+    context = {
+        'children': children, 
+        'activities': activities
+    }
     return render(request, 'children/assign_modules.html', context)
+
 
 @parent_required
 def progress_overview(request):
@@ -213,5 +217,5 @@ def assign_activity(request, child_pk):
                 activity=activity,
                 defaults={"assigned_by": request.user},
             )
-        return redirect("children:child_dashboard", pk=child.pk)
-    return redirect("children:child_dashboard", pk=child.pk)
+        return redirect("children:child_dashboard", pk=child_pk)
+    return redirect("children:child_dashboard", pk=child_pk)
