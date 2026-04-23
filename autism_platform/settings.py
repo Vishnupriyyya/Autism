@@ -16,10 +16,10 @@ SECRET_KEY = os.environ.get(
 )
 # Generated secure key (use this in Cloud Run Secrets): django-insecure-autism-platform-cloud-run-2024#kX9pL2mQ8vR5tY7uW3sE6nJ1hZ4bC0fG!
 DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
-ALLOWED_HOSTS = [
-    'autism-310236859100.asia-south1.run.app'
+ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = [
+    'https://autism-310236859100.asia-south1.run.app'
 ]
-
 # Application definition
 INSTALLED_APPS = [
     "django.contrib.admin",
